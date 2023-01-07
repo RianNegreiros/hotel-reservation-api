@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go-lodging/pkg/config"
-	"go-lodging/pkg/handlers"
+	"go-lodging/internal/config"
+	"go-lodging/internal/handlers"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -22,8 +22,11 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/suites", handlers.Repo.Suites)
 	mux.Get("/search-availability", handlers.Repo.Availability)
 	mux.Post("/search-availability", handlers.Repo.PostAvailability)
+	mux.Post("/search-availability-json", handlers.Repo.AvailabilityJSON)
 
 	mux.Get("/make-reservation", handlers.Repo.Reservation)
+	mux.Post("/make-reservation", handlers.Repo.PostReservation)
+	mux.Get("/reservation-summary", handlers.Repo.ReservationSummary)
 
 	filesServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", filesServer))
