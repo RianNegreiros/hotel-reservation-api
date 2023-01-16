@@ -1,6 +1,7 @@
 package config
 
 import (
+	"go-lodging/internal/models"
 	"html/template"
 	"log"
 
@@ -15,4 +16,5 @@ type AppConfig struct {
 	Session       *scs.SessionManager
 	InfoLog       *log.Logger
 	ErrorLog      *log.Logger
+	MailChan      chan models.MailData
 }
