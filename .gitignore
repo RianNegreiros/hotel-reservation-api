@@ -1,3 +1,5 @@
 .idea
 .vscode
 database.yml
+lodging
+run.sh
