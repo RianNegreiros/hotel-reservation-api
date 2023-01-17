@@ -46,7 +46,7 @@ func NewRenderer(a *config.AppConfig) {
 
 // HumanDate returns time in YYYY-MM-DD format
 func HumanDate(t time.Time) string {
-	return t.Format("2006-01-02")
+	return t.Format("2001-01-01")
 }
 
 func FormatDate(t time.Time, f string) string {
