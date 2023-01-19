@@ -38,7 +38,7 @@ func main() {
 	fmt.Println("Staring mail listener...")
 	listenForMail()
 
-	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
+	fmt.Println("Starting application on port", portNumber)
 
 	srv := &http.Server{
 		Addr:    portNumber,
