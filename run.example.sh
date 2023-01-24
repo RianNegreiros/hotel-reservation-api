@@ -1,2 +1,2 @@
 go build -o lodging cmd/web/*go
-./lodging -dbname= -dbuser= -cache=false -production=false
+./lodging -dbname=golodging -dbuser=golodging -cache=false -production=false
