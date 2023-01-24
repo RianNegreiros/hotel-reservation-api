@@ -17,7 +17,6 @@
 
 - [Golang](https://go.dev/)
 - [PostgresQL](https://www.postgresql.org/)
-- [Soda](https://gobuffalo.io/documentation/database/soda/)
 - [MailHog](https://github.com/mailhog/MailHog)
 - [nosurf](https://pkg.go.dev/github.com/justinas/nosurf@v1.1.1)
 - [SCS](https://pkg.go.dev/github.com/alexedwards/scs/v2@v2.5.0)
@@ -26,12 +25,17 @@
 
 ### Prerequisites
 
-1. Install [Docker Compose](https://docs.docker.com/compose/gettingstarted/)
+[Docker Compose](https://docs.docker.com/compose/gettingstarted/)
+[Soda](https://gobuffalo.io/documentation/database/soda/)
 
-2. Rename run.example.sh to run.sh
+1. Remove **.example** from run.exmaple.sh filename, fill the parameters:
+  - dbhost(default:localhost), dbname, dbuser, dbpass, dbport(default: 5432), dbssl(default: disable) according to PostgreSQL config on docker-compose.yml
+  - useCache(default:true) to cache the application templates
+  - inProduction(default:true) to set prodcution mode
+3. Remove **.example** from database.example.yml filename and fill the values according to PostgreSQL config on docker-compose.yml
 
-3. Fill the parameters according to PostgreSQL config on docker-compose.yml
+4. Run soda migrate
 
-4. Execute ./run.sh
+5. Execute ./run.sh
 
-5. Go to localhost:8080 on your preferably browser
+6. Go to localhost:8080 on your preferably browser
