@@ -37,6 +37,14 @@ func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	}
 }
 
+// NewTestRepo creates a new repository
+func NewTestRepo(a *config.AppConfig) *Repository {
+	return &Repository{
+		App: a,
+		DB:  dbrepo.NewTestingsRepo(a),
+	}
+}
+
 // NewHandlers sets the repository for the handlers
 func NewHandlers(r *Repository) {
 	Repo = r
@@ -676,7 +684,7 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 		reservationMap := make(map[string]int)
 		blockMap := make(map[string]int)
 
-		for d := firstOfMonth; d.After(lastOfMonth) == false; d = d.AddDate(0, 0, 1) {
+		for d := firstOfMonth; !d.After(lastOfMonth); d = d.AddDate(0, 0, 1) {
 			reservationMap[d.Format("2006-01-2")] = 0
 			blockMap[d.Format("2006-01-2")] = 0
 		}
@@ -691,7 +699,7 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 		for _, y := range restrictions {
 			if y.ReservationID > 0 {
 				// it's a reservation
-				for d := y.StartDate; d.After(y.EndDate) == false; d = d.AddDate(0, 0, 1) {
+				for d := y.StartDate; !d.After(y.EndDate); d = d.AddDate(0, 0, 1) {
 					reservationMap[d.Format("2006-01-2")] = y.ReservationID
 				}
 			} else {
