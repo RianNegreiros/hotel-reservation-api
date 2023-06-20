@@ -1,6 +1,2 @@
-.idea
-.vscode
-database.yml
-lodging
-run.sh
-db-data
+bin
+.env

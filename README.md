@@ -1,41 +1,48 @@
-# Lodging App
+# Hotel reservation backend
 
-## Application inspired on Airbnb to search for short-term rental
+## Project
 
-## [Live Site](https://go-lodging.onrender.com/)
+- users -> book room from an hotel
+- admins -> going to check reservation/bookings
+- Authentication and authorization -> JWT tokens
+- Hotels -> CRUD API -> JSON
+- Rooms -> CRUD API -> JSON
+- Scripts -> datasabe management -> seeding, migration
 
-### Preview
+## Resources
 
-![Application Preview 1](/Documentation/Preview1.png)
-![Application Preview 2](/Documentation/Preview2.png)
+### MongoDb
 
-### Methodologies
+Documenation
 
-- MVC
+```
+https://www.mongodb.com/docs/
+```
 
-### Tecnologies and Tools
+Install
 
-- [Golang](https://go.dev/)
-- [PostgresQL](https://www.postgresql.org/)
-- [MailHog](https://github.com/mailhog/MailHog)
-- [nosurf](https://pkg.go.dev/github.com/justinas/nosurf@v1.1.1)
-- [SCS](https://pkg.go.dev/github.com/alexedwards/scs/v2@v2.5.0)
+```bash
+go get go.mongodb.org/mongo-driver/mongo
+```
 
-## How to run
+### gofiber
 
-### Prerequisites
+Documentation
 
-[Docker Compose](https://docs.docker.com/compose/gettingstarted/)
-[Soda](https://gobuffalo.io/documentation/database/soda/)
+```
+https://gofiber.io
+```
 
-1. Remove **.example** from run.exmaple.sh filename, fill the parameters:
-  - dbhost(default:localhost), dbname, dbuser, dbpass, dbport(default: 5432), dbssl(default: disable) according to PostgreSQL config on docker-compose.yml
-  - useCache(default:true) to cache the application templates
-  - inProduction(default:true) to set prodcution mode
-3. Remove **.example** from database.example.yml filename and fill the values according to PostgreSQL config on docker-compose.yml
+Install
 
-4. Run soda migrate
+```bash
+go get github.com/gofiber/fiber/v2
+```
 
-5. Execute ./run.sh
+## Docker
 
-6. Go to localhost:8080 on your preferably browser
+### Install mongodb as Docker container
+
+```bash
+docker run --name mongodb -d mongo:latest -p 27017:27017
+```
