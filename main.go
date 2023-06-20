@@ -3,34 +3,40 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 
+	"github.com/RianNegreiros/hotel-reservation/api"
+	"github.com/RianNegreiros/hotel-reservation/db"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const dbUri = "mongodb://localhost:27017"
+const dbName = "hotel-reservation"
+const userCollection = "users"
+
+var config = fiber.Config{
+	ErrorHandler: func(c *fiber.Ctx, err error) error {
+		return c.JSON(map[string]string{"error": err.Error()})
+	},
+}
 
 func main() {
+	listenAddr := flag.String("listenAddr", ":5000", "Listen address")
+	flag.Parse()
+
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dbUri))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(client)
+	userHandler := api.NewUserHandler(db.NewMongoUserStore(client))
 
-	listenAddr := flag.String("listenAddr", ":5000", "Listen address")
-	flag.Parse()
-
-	app := fiber.New()
+	app := fiber.New(config)
 	apiv1 := app.Group("/api/v1")
 
-	apiv1.Get("/alive", handleAlive)
+	apiv1.Get("/user", userHandler.HandleGetUsers)
+	apiv1.Get("/user/:id", userHandler.HandleGetUser)
 	app.Listen(*listenAddr)
-}
-
-func handleAlive(c *fiber.Ctx) error {
-	return c.JSON((map[string]string{"message": "I'm alive!"}))
 }
