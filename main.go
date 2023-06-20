@@ -1,12 +1,26 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"fmt"
+	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const dbUri = "mongodb://localhost:27017"
+
 func main() {
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dbUri))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(client)
+
 	listenAddr := flag.String("listenAddr", ":5000", "Listen address")
 	flag.Parse()
 
