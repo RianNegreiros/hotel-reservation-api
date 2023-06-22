@@ -16,6 +16,7 @@ type UserStore interface {
 	GetUsers(context.Context) ([]*types.User, error)
 	InsertUser(context.Context, *types.User) (*types.User, error)
 	DeleteUser(context.Context, string) error
+	UpdateUser(context.Context, bson.M, types.UpdateUserParams) error
 }
 
 type MongoUserStore struct {
@@ -76,4 +77,16 @@ func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*types.Use
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (s *MongoUserStore) UpdateUser(ctx context.Context, filter bson.M, params types.UpdateUserParams) error {
+	update := bson.D{
+		{Key: "$set", Value: params.ToBSON()},
+	}
+
+	_, err := s.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
