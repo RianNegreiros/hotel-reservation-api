@@ -23,27 +23,43 @@ type CreateUserParams struct {
 	Password  string `json:"password"`
 }
 
-func (params CreateUserParams) Validate() []string {
-	errors := []string{}
+func (params CreateUserParams) Validate() map[string]string {
+	errors := map[string]string{}
+
+	if params.FirstName == "" {
+		errors["firstName"] = "required"
+	}
+
+	if params.LastName == "" {
+		errors["lastName"] = "required"
+	}
+
+	if params.Email == "" {
+		errors["email"] = "required"
+	}
+
+	if params.Password == "" {
+		errors["password"] = "required"
+	}
 
 	if len(params.Password) < minPassLen {
-		errors = append(errors, fmt.Sprintf("password must be at least %d characters", minPassLen))
+		errors["password"] = fmt.Sprintf("must be at least %d characters", minPassLen)
 	}
 
 	if len(params.Password) > maxPassLen {
-		errors = append(errors, fmt.Sprintf("password must be at most %d characters", maxPassLen))
+		errors["password"] = fmt.Sprintf("must be at most %d characters", maxPassLen)
 	}
 
 	if len(params.FirstName) < minFirstNameLen {
-		errors = append(errors, fmt.Sprintf("firstName must be at least %d characters", minFirstNameLen))
+		errors["firstName"] = fmt.Sprintf("must be at least %d characters", minFirstNameLen)
 	}
 
 	if len(params.LastName) < minLastNameLen {
-		errors = append(errors, fmt.Sprintf("lastName must be at least %d characters", minLastNameLen))
+		errors["lastName"] = fmt.Sprintf("must be at least %d characters", minLastNameLen)
 	}
 
 	if !isEmailValid(params.Email) {
-		errors = append(errors, fmt.Sprintf("email is invalid"))
+		errors["email"] = "must be a valid email address"
 	}
 
 	return errors
