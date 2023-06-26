@@ -28,6 +28,9 @@ func main() {
 	}
 
 	var (
+		app   = fiber.New(config)
+		apiv1 = app.Group("/api/v1")
+
 		userStore   = db.NewMongoUserStore(client)
 		userHandler = api.NewUserHandler(userStore)
 
@@ -35,9 +38,6 @@ func main() {
 		roomStore    = db.NewMongoRoomStore(client, hotelStore)
 		hotelHandler = api.NewHotelHandler(hotelStore, roomStore)
 	)
-
-	app := fiber.New(config)
-	apiv1 := app.Group("/api/v1")
 
 	// User routes
 	apiv1.Get("/user/:id", userHandler.HandleGetUser)
