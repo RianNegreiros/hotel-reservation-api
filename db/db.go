@@ -5,3 +5,9 @@ const (
 	TESTDB = "hotel-reservation-test"
 	DBURI  = "mongodb://localhost:27018"
 )
+
+type Store struct {
+	User  UserStore
+	Hotel HotelStore
+	Room  RoomStore
+}

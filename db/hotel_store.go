@@ -13,6 +13,7 @@ type HotelStore interface {
 	Insert(context.Context, *types.Hotel) (*types.Hotel, error)
 	Update(context.Context, bson.M, bson.M) error
 	All(context.Context, bson.M) ([]*types.Hotel, error)
+	GetByID(context.Context, primitive.ObjectID) (*types.Hotel, error)
 }
 
 type MongoHotelStore struct {
@@ -54,4 +55,12 @@ func (s *MongoHotelStore) All(ctx context.Context, filter bson.M) ([]*types.Hote
 		return nil, err
 	}
 	return hotels, nil
+}
+
+func (s *MongoHotelStore) GetByID(ctx context.Context, id primitive.ObjectID) (*types.Hotel, error) {
+	var hotel *types.Hotel
+	if err := s.collection.FindOne(ctx, bson.M{"_id": id}).Decode(&hotel); err != nil {
+		return nil, err
+	}
+	return hotel, nil
 }
