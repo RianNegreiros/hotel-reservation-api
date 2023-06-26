@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/RianNegreiros/hotel-reservation/db"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type HotelHandler struct {
@@ -15,9 +16,14 @@ func NewHotelHandler(hotelStore db.HotelStore, roomStore db.RoomStore) *HotelHan
 }
 
 func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
-	hotels, err := h.hotelStore.All(c.Context(), nil)
+	var (
+		filter = bson.M{}
+	)
+
+	hotels, err := h.hotelStore.All(c.Context(), filter)
 	if err != nil {
 		return err
 	}
+
 	return c.JSON(hotels)
 }
