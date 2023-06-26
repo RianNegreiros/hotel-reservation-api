@@ -40,7 +40,7 @@ func seedHotel(name, location string) {
 		},
 	}
 
-	insertedHotel, err := hotelStore.InsertHotel(ctx, hotel)
+	insertedHotel, err := hotelStore.Insert(ctx, hotel)
 	if err != nil {
 		log.Fatal(err)
 	}

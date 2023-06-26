@@ -10,8 +10,9 @@ import (
 )
 
 type HotelStore interface {
-	InsertHotel(context.Context, *types.Hotel) (*types.Hotel, error)
+	Insert(context.Context, *types.Hotel) (*types.Hotel, error)
 	Update(context.Context, bson.M, bson.M) error
+	All(context.Context, bson.M) ([]*types.Hotel, error)
 }
 
 type MongoHotelStore struct {
@@ -26,7 +27,7 @@ func NewMongoHotelStore(client *mongo.Client) *MongoHotelStore {
 	}
 }
 
-func (s *MongoHotelStore) InsertHotel(ctx context.Context, hotel *types.Hotel) (*types.Hotel, error) {
+func (s *MongoHotelStore) Insert(ctx context.Context, hotel *types.Hotel) (*types.Hotel, error) {
 	resp, err := s.collection.InsertOne(ctx, hotel)
 	if err != nil {
 		return nil, err
@@ -41,4 +42,16 @@ func (s *MongoHotelStore) Update(ctx context.Context, filter bson.M, update bson
 		return err
 	}
 	return nil
+}
+
+func (s *MongoHotelStore) All(ctx context.Context, filter bson.M) ([]*types.Hotel, error) {
+	resp, err := s.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	var hotels []*types.Hotel
+	if err := resp.All(ctx, &hotels); err != nil {
+		return nil, err
+	}
+	return hotels, nil
 }
