@@ -10,7 +10,8 @@ import (
 )
 
 type RoomStore interface {
-	InsertRoom(context.Context, *types.Room) (*types.Room, error)
+	Insert(context.Context, *types.Room) (*types.Room, error)
+	All(context.Context, bson.M) ([]*types.Room, error)
 }
 
 type MongoRoomStore struct {
@@ -28,7 +29,7 @@ func NewMongoRoomStore(client *mongo.Client, hotelStore HotelStore) *MongoRoomSt
 	}
 }
 
-func (s *MongoRoomStore) InsertRoom(ctx context.Context, room *types.Room) (*types.Room, error) {
+func (s *MongoRoomStore) Insert(ctx context.Context, room *types.Room) (*types.Room, error) {
 	resp, err := s.collection.InsertOne(ctx, room)
 	if err != nil {
 		return nil, err
@@ -42,4 +43,18 @@ func (s *MongoRoomStore) InsertRoom(ctx context.Context, room *types.Room) (*typ
 	}
 
 	return room, nil
+}
+
+func (s *MongoRoomStore) All(ctx context.Context, filter bson.M) ([]*types.Room, error) {
+	var rooms []*types.Room
+
+	resp, err := s.collection.Find(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+	if err := resp.All(ctx, &rooms); err != nil {
+		return nil, err
+	}
+
+	return rooms, nil
 }
