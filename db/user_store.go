@@ -20,6 +20,7 @@ type UserStore interface {
 	Dropper
 
 	GetUserByID(context.Context, string) (*types.User, error)
+	GetUserByEmail(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
 	InsertUser(context.Context, *types.User) (*types.User, error)
 	DeleteUser(context.Context, string) error
@@ -101,4 +102,12 @@ func (s *MongoUserStore) UpdateUser(ctx context.Context, filter bson.M, params t
 		return err
 	}
 	return nil
+}
+
+func (s *MongoUserStore) GetUserByEmail(ctx context.Context, email string) (*types.User, error) {
+	var user types.User
+	if err := s.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
