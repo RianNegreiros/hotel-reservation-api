@@ -16,7 +16,7 @@ import (
 func TestAuthenticateWithWrongPassword(t *testing.T) {
 	testdb := setup(t)
 	defer testdb.teardown(t)
-	fixtures.AddUser(testdb.Store, "john", "doe")
+	fixtures.AddUser(testdb.Store, "john", "doe", false)
 
 	app := fiber.New()
 	authHandler := NewAuthHandler(testdb.User)
@@ -51,7 +51,7 @@ func TestAuthenticateWithWrongPassword(t *testing.T) {
 func TestAuthenticateSuccess(t *testing.T) {
 	testdb := setup(t)
 	defer testdb.teardown(t)
-	insertedUser := fixtures.AddUser(testdb.Store, "john", "doe")
+	insertedUser := fixtures.AddUser(testdb.Store, "john", "doe", false)
 
 	app := fiber.New()
 	authHandler := NewAuthHandler(testdb.User)
