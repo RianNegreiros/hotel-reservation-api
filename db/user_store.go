@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/RianNegreiros/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/bson"
@@ -10,7 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const userCollection = "users"
+const userColl = "users"
+
+type Map map[string]any
 
 type Dropper interface {
 	Drop(context.Context) error
@@ -19,29 +22,44 @@ type Dropper interface {
 type UserStore interface {
 	Dropper
 
-	GetUserByID(context.Context, string) (*types.User, error)
 	GetUserByEmail(context.Context, string) (*types.User, error)
+	GetUserByID(context.Context, string) (*types.User, error)
 	GetUsers(context.Context) ([]*types.User, error)
 	InsertUser(context.Context, *types.User) (*types.User, error)
 	DeleteUser(context.Context, string) error
-	UpdateUser(context.Context, bson.M, types.UpdateUserParams) error
+	UpdateUser(ctx context.Context, filter Map, params types.UpdateUserParams) error
 }
 
 type MongoUserStore struct {
-	client     *mongo.Client
-	collection *mongo.Collection
+	client *mongo.Client
+	coll   *mongo.Collection
 }
 
 func NewMongoUserStore(client *mongo.Client) *MongoUserStore {
+	dbname := os.Getenv(MongoDBNameEnvName)
 	return &MongoUserStore{
-		client:     client,
-		collection: client.Database(DBNAME).Collection(userCollection),
+		client: client,
+		coll:   client.Database(dbname).Collection(userColl),
 	}
 }
 
 func (s *MongoUserStore) Drop(ctx context.Context) error {
-	fmt.Println("Dropping users collection")
-	return s.collection.Drop(ctx)
+	fmt.Println("--- dropping user collection")
+	return s.coll.Drop(ctx)
+}
+
+func (s *MongoUserStore) UpdateUser(ctx context.Context, filter Map, params types.UpdateUserParams) error {
+	oid, err := primitive.ObjectIDFromHex(filter["_id"].(string))
+	if err != nil {
+		return err
+	}
+	filter["_id"] = oid
+	update := bson.M{"$set": params.ToBSON()}
+	_, err = s.coll.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) error {
@@ -49,8 +67,9 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-
-	_, err = s.collection.DeleteOne(ctx, bson.M{"_id": oid})
+	// TODO: Maybe its a good idea to handle if we did not delete any user.
+	// maybe log it or something??
+	_, err = s.coll.DeleteOne(ctx, bson.M{"_id": oid})
 	if err != nil {
 		return err
 	}
@@ -58,7 +77,7 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) error {
 }
 
 func (s *MongoUserStore) InsertUser(ctx context.Context, user *types.User) (*types.User, error) {
-	res, err := s.collection.InsertOne(ctx, user)
+	res, err := s.coll.InsertOne(ctx, user)
 	if err != nil {
 		return nil, err
 	}
@@ -67,16 +86,23 @@ func (s *MongoUserStore) InsertUser(ctx context.Context, user *types.User) (*typ
 }
 
 func (s *MongoUserStore) GetUsers(ctx context.Context) ([]*types.User, error) {
-	cur, err := s.collection.Find(ctx, bson.M{})
+	cur, err := s.coll.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
 	var users []*types.User
 	if err := cur.All(ctx, &users); err != nil {
-		return []*types.User{}, err
+		return nil, err
 	}
-
 	return users, nil
+}
+
+func (s *MongoUserStore) GetUserByEmail(ctx context.Context, email string) (*types.User, error) {
+	var user types.User
+	if err := s.coll.FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*types.User, error) {
@@ -84,26 +110,8 @@ func (s *MongoUserStore) GetUserByID(ctx context.Context, id string) (*types.Use
 	if err != nil {
 		return nil, err
 	}
-
 	var user types.User
-	if err := s.collection.FindOne(ctx, bson.M{"_id": oid}).Decode(&user); err != nil {
-		return nil, err
-	}
-	return &user, nil
-}
-
-func (s *MongoUserStore) UpdateUser(ctx context.Context, filter bson.M, params types.UpdateUserParams) error {
-	update := bson.M{"$set": params}
-	_, err := s.collection.UpdateOne(ctx, filter, update)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (s *MongoUserStore) GetUserByEmail(ctx context.Context, email string) (*types.User, error) {
-	var user types.User
-	if err := s.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user); err != nil {
+	if err := s.coll.FindOne(ctx, bson.M{"_id": oid}).Decode(&user); err != nil {
 		return nil, err
 	}
 	return &user, nil

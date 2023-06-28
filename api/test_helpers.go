@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"log"
+	"os"
 	"testing"
 
 	"github.com/RianNegreiros/hotel-reservation/db"
@@ -15,24 +17,26 @@ type testdb struct {
 }
 
 func (tdb *testdb) teardown(t *testing.T) {
-	if err := tdb.client.Database(db.DBNAME).Drop(context.TODO()); err != nil {
+	dbname := os.Getenv(db.MongoDBNameEnvName)
+	if err := tdb.client.Database(dbname).Drop(context.TODO()); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func setup(t *testing.T) *testdb {
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	dburi := os.Getenv("MONGO_DB_URL_TEST")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(dburi))
 	if err != nil {
-		t.Fatal(err)
+		log.Fatal(err)
 	}
-
 	hotelStore := db.NewMongoHotelStore(client)
 	return &testdb{
 		client: client,
 		Store: &db.Store{
-			Hotel: hotelStore,
-			User:  db.NewMongoUserStore(client),
-			Room:  db.NewMongoRoomStore(client, hotelStore),
+			Hotel:   hotelStore,
+			User:    db.NewMongoUserStore(client),
+			Room:    db.NewMongoRoomStore(client, hotelStore),
+			Booking: db.NewMongoBookingStore(client),
 		},
 	}
 }

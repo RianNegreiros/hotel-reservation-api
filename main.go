@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
+	"os"
 
 	"github.com/RianNegreiros/hotel-reservation/api"
-	"github.com/RianNegreiros/hotel-reservation/api/middleware"
 	"github.com/RianNegreiros/hotel-reservation/db"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,16 +13,12 @@ import (
 )
 
 var config = fiber.Config{
-	ErrorHandler: func(c *fiber.Ctx, err error) error {
-		return c.JSON(map[string]string{"error": err.Error()})
-	},
+	ErrorHandler: api.ErrorHandler,
 }
 
 func main() {
-	listenAddr := flag.String("listenAddr", ":5000", "Listen address")
-	flag.Parse()
-
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(db.DBURI))
+	mongoEndpoint := os.Getenv("MONGO_DB_URL")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoEndpoint))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,8 +41,8 @@ func main() {
 
 		app   = fiber.New(config)
 		auth  = app.Group("/api")
-		apiv1 = app.Group("/api/v1", middleware.JWTAuthentication(userStore))
-		admin = apiv1.Group("/admin", middleware.AdminAuth)
+		apiv1 = app.Group("/api/v1", api.JWTAuthentication(userStore))
+		admin = apiv1.Group("/admin", api.AdminAuth)
 	)
 
 	// Auth routes
@@ -69,12 +64,13 @@ func main() {
 	apiv1.Get("/room", roomHandler.HandleGetRooms)
 	apiv1.Post("room/:id/book", roomHandler.HandleBookRoom)
 
-	// Booking routes
-	apiv1.Get("/bookings", bookingHandler.HandleGetBookings)
-	apiv1.Patch("/bookings/:id/cancel", bookingHandler.HandleCancelBooking)
+	// bookings handlers
+	apiv1.Get("/booking/:id", bookingHandler.HandleGetBooking)
+	apiv1.Get("/booking/:id/cancel", bookingHandler.HandleCancelBooking)
 
-	// Admin routes
-	admin.Get("/bookings/:id", bookingHandler.HandleGetBooking)
+	// admin handlers
+	admin.Get("/booking", bookingHandler.HandleGetBookings)
 
-	app.Listen(*listenAddr)
+	listenAddr := os.Getenv("HTTP_LISTEN_ADDRESS")
+	app.Listen(listenAddr)
 }

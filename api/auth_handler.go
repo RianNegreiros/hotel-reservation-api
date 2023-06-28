@@ -19,7 +19,9 @@ type AuthHandler struct {
 }
 
 func NewAuthHandler(userStore db.UserStore) *AuthHandler {
-	return &AuthHandler{userStore: userStore}
+	return &AuthHandler{
+		userStore: userStore,
+	}
 }
 
 type AuthParams struct {

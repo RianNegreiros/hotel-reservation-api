@@ -11,20 +11,19 @@ import (
 )
 
 func TestPostUser(t *testing.T) {
-	db := setup(t)
-	defer db.teardown(t)
+	tdb := setup(t)
+	defer tdb.teardown(t)
 
 	app := fiber.New()
-	userHandler := NewUserHandler(db.User)
+	userHandler := NewUserHandler(tdb.User)
 	app.Post("/", userHandler.HandlePostUser)
 
 	params := types.CreateUserParams{
+		Email:     "john@doe.com",
 		FirstName: "John",
 		LastName:  "Doe",
-		Email:     "johndoe@mail.com",
-		Password:  "123456",
+		Password:  "lkdfjkdsjfklfdjkedf",
 	}
-
 	b, _ := json.Marshal(params)
 	req := httptest.NewRequest("POST", "/", bytes.NewReader(b))
 	req.Header.Add("Content-Type", "application/json")

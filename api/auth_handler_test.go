@@ -49,17 +49,17 @@ func TestAuthenticateWithWrongPassword(t *testing.T) {
 }
 
 func TestAuthenticateSuccess(t *testing.T) {
-	testdb := setup(t)
-	defer testdb.teardown(t)
-	insertedUser := fixtures.AddUser(testdb.Store, "john", "doe", false)
+	tdb := setup(t)
+	defer tdb.teardown(t)
+	insertedUser := fixtures.AddUser(tdb.Store, "john", "doe", false)
 
 	app := fiber.New()
-	authHandler := NewAuthHandler(testdb.User)
+	authHandler := NewAuthHandler(tdb.User)
 	app.Post("/auth", authHandler.HandleAuthenticate)
 
 	params := AuthParams{
 		Email:    "john@doe.com",
-		Password: "123456",
+		Password: "john_doe",
 	}
 	b, _ := json.Marshal(params)
 	req := httptest.NewRequest("POST", "/auth", bytes.NewReader(b))
@@ -79,7 +79,6 @@ func TestAuthenticateSuccess(t *testing.T) {
 	if authResp.Token == "" {
 		t.Fatalf("expected the JWT token to be present in the auth response")
 	}
-
 	insertedUser.EncryptedPassword = ""
 	if !reflect.DeepEqual(insertedUser, authResp.User) {
 		fmt.Println(insertedUser)

@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/RianNegreiros/hotel-reservation/db"
-	"github.com/RianNegreiros/hotel-reservation/types"
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -19,25 +18,22 @@ func (h *BookingHandler) HandleGetBooking(c *fiber.Ctx) error {
 	id := c.Params("id")
 	booking, err := h.store.Booking.GetByID(c.Context(), id)
 	if err != nil {
-		return err
+		return ErrNotResourceNotFound("booking")
 	}
-
-	user, ok := c.Context().Value("user").(*types.User)
-	if !ok {
-		return fiber.ErrUnauthorized
+	user, err := getAuthUser(c)
+	if err != nil {
+		return ErrUnAuthorized()
 	}
-
 	if booking.UserID != user.ID {
-		return fiber.ErrUnauthorized
+		return ErrUnAuthorized()
 	}
-
 	return c.JSON(booking)
 }
 
 func (h *BookingHandler) HandleGetBookings(c *fiber.Ctx) error {
-	bookings, err := h.store.Booking.GetAll(c.Context(), nil)
+	bookings, err := h.store.Booking.GetAll(c.Context(), bson.M{})
 	if err != nil {
-		return err
+		return ErrNotResourceNotFound("bookings")
 	}
 	return c.JSON(bookings)
 }
