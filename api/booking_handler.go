@@ -4,6 +4,7 @@ import (
 	"github.com/RianNegreiros/hotel-reservation/db"
 	"github.com/RianNegreiros/hotel-reservation/types"
 	"github.com/gofiber/fiber/v2"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 type BookingHandler struct {
@@ -39,4 +40,29 @@ func (h *BookingHandler) HandleGetBookings(c *fiber.Ctx) error {
 		return err
 	}
 	return c.JSON(bookings)
+}
+
+func (h *BookingHandler) HandleCancelBooking(c *fiber.Ctx) error {
+	id := c.Params("id")
+	booking, err := h.store.Booking.GetByID(c.Context(), id)
+	if err != nil {
+		return err
+	}
+
+	user, err := getAuthUser(c)
+	if err != nil {
+		return err
+	}
+	if booking.UserID != user.ID {
+		return fiber.ErrUnauthorized
+	}
+
+	if err := h.store.Booking.Update(c.Context(), c.Params("id"), bson.M{"canceled": true}); err != nil {
+		return err
+	}
+
+	return c.JSON(genericResp{
+		Type: "success",
+		Msg:  "booking cancelled",
+	})
 }
