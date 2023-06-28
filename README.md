@@ -15,8 +15,8 @@
 
 Documenation
 
-```
-https://www.mongodb.com/docs/
+```url
+https://www.mongodb.com/docs/drivers/go
 ```
 
 Install
@@ -29,8 +29,8 @@ go get go.mongodb.org/mongo-driver/mongo
 
 Documentation
 
-```
-https://gofiber.io
+```url
+https://docs.gofiber.io
 ```
 
 Install
