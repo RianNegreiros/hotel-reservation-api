@@ -4,15 +4,31 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/RianNegreiros/hotel-reservation/db"
 	"github.com/RianNegreiros/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func AddRoom(store *db.Store, size string, ss bool, price float64, hid primitive.ObjectID) *types.Room {
+func AddBooking(store *db.Store, uid, rid primitive.ObjectID, from, to time.Time) *types.Booking {
+	booking := &types.Booking{
+		UserID:   uid,
+		RoomID:   rid,
+		FromDate: from,
+		ToDate:   to,
+	}
+	insertedBooking, err := store.Booking.Insert(context.Background(), booking)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return insertedBooking
+}
+
+func AddRoom(store *db.Store, size string, deluxe bool, price float64, hid primitive.ObjectID) *types.Room {
 	room := &types.Room{
 		Size:    size,
+		Deluxe:  deluxe,
 		Price:   price,
 		HotelID: hid,
 	}
@@ -41,7 +57,7 @@ func AddHotel(store *db.Store, name string, loc string, rating float64, rooms []
 	return insertedHotel
 }
 
-func AddUser(store *db.Store, fn, ln string) *types.User {
+func AddUser(store *db.Store, fn, ln string, admin bool) *types.User {
 	user, err := types.NewUserFromParams(types.CreateUserParams{
 		Email:     fmt.Sprintf("%s@%s.com", fn, ln),
 		FirstName: fn,
@@ -51,6 +67,7 @@ func AddUser(store *db.Store, fn, ln string) *types.User {
 	if err != nil {
 		log.Fatal(err)
 	}
+	user.IsAdmin = admin
 	insertedUser, err := store.User.InsertUser(context.TODO(), user)
 	if err != nil {
 		log.Fatal(err)
