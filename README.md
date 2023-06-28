@@ -1,4 +1,4 @@
-# Hotel reservation backend
+# Hotel Reservation Back-end
 
 ## Project
 
