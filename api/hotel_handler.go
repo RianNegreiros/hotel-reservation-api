@@ -18,7 +18,7 @@ func NewHotelHandler(store *db.Store) *HotelHandler {
 }
 
 func (h *HotelHandler) HandleGetHotels(c *fiber.Ctx) error {
-	hotels, err := h.store.Hotel.All(c.Context(), bson.M{})
+	hotels, err := h.store.Hotel.GetAll(c.Context(), bson.M{})
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (h *HotelHandler) HandleGetRooms(c *fiber.Ctx) error {
 	}
 
 	filter := bson.M{"_id": oid}
-	rooms, err := h.store.Room.All(c.Context(), filter)
+	rooms, err := h.store.Room.GetAll(c.Context(), filter)
 	if err != nil {
 		return err
 	}
