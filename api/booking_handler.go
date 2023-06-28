@@ -18,5 +18,9 @@ func (h *BookingHandler) HandleGetBooking(c *fiber.Ctx) error {
 }
 
 func (h *BookingHandler) HandleGetBookings(c *fiber.Ctx) error {
-	return nil
+	bookings, err := h.store.Booking.GetAll(c.Context(), nil)
+	if err != nil {
+		return err
+	}
+	return c.JSON(bookings)
 }

@@ -69,7 +69,7 @@ func main() {
 	apiv1.Post("room/:id/book", roomHandler.HandleBookRoom)
 
 	// Booking routes
-	apiv1.Get("/booking", bookingHandler.HandleGetBookings)
+	apiv1.Get("/bookings", bookingHandler.HandleGetBookings)
 
 	app.Listen(*listenAddr)
 }
