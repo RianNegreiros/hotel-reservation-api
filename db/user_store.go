@@ -67,10 +67,7 @@ func (s *MongoUserStore) DeleteUser(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	// TODO: Maybe its a good idea to handle if we did not delete any user.
-	// maybe log it or something??
-	_, err = s.coll.DeleteOne(ctx, bson.M{"_id": oid})
-	if err != nil {
+	if err := s.coll.FindOneAndDelete(ctx, bson.M{"_id": oid}).Err(); err != nil {
 		return err
 	}
 	return nil
