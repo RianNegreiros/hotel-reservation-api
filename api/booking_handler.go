@@ -42,19 +42,19 @@ func (h *BookingHandler) HandleCancelBooking(c *fiber.Ctx) error {
 	id := c.Params("id")
 	booking, err := h.store.Booking.GetByID(c.Context(), id)
 	if err != nil {
-		return err
+		return ErrNotResourceNotFound("booking")
 	}
 
 	user, err := getAuthUser(c)
 	if err != nil {
-		return err
+		return ErrUnAuthorized()
 	}
 	if booking.UserID != user.ID {
-		return fiber.ErrUnauthorized
+		return ErrUnAuthorized()
 	}
 
 	if err := h.store.Booking.Update(c.Context(), c.Params("id"), bson.M{"canceled": true}); err != nil {
-		return err
+		return ErrNotResourceNotFound("booking")
 	}
 
 	return c.JSON(genericResp{
