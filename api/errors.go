@@ -37,7 +37,7 @@ func ErrUnAuthorized() Error {
 	}
 }
 
-func ErrNotResourceNotFound(res string) Error {
+func ErrResourceNotFound(res string) Error {
 	return Error{
 		Code: http.StatusNotFound,
 		Err:  res + " resource not found",

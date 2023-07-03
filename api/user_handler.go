@@ -78,7 +78,7 @@ func (h *UserHandler) HandleGetUser(c *fiber.Ctx) error {
 func (h *UserHandler) HandleGetUsers(c *fiber.Ctx) error {
 	users, err := h.userStore.GetUsers(c.Context())
 	if err != nil {
-		return ErrNotResourceNotFound("user")
+		return ErrResourceNotFound("user")
 	}
 	return c.JSON(users)
 }
