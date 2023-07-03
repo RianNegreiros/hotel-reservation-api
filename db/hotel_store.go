@@ -7,12 +7,13 @@ import (
 	"github.com/RianNegreiros/hotel-reservation/types"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type HotelStore interface {
 	Insert(context.Context, *types.Hotel) (*types.Hotel, error)
 	Update(context.Context, Map, Map) error
-	GetAll(context.Context, Map) ([]*types.Hotel, error)
+	GetAll(context.Context, Map, *options.FindOptions) ([]*types.Hotel, error)
 	GetByID(context.Context, string) (*types.Hotel, error)
 }
 
@@ -43,8 +44,8 @@ func (s *MongoHotelStore) Update(ctx context.Context, filter Map, update Map) er
 	return err
 }
 
-func (s *MongoHotelStore) GetAll(ctx context.Context, filter Map) ([]*types.Hotel, error) {
-	resp, err := s.collection.Find(ctx, filter)
+func (s *MongoHotelStore) GetAll(ctx context.Context, filter Map, opts *options.FindOptions) ([]*types.Hotel, error) {
+	resp, err := s.collection.Find(ctx, filter, opts)
 	if err != nil {
 		return nil, err
 	}
