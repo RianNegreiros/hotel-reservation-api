@@ -1,4 +1,4 @@
-# Hotel Reservation Back-end
+# Hotel Reservation CRUD API
 
 ## Project
 
@@ -39,10 +39,16 @@ Install
 go get github.com/gofiber/fiber/v2
 ```
 
-## Docker
+### Docker
 
-### Install mongodb as Docker container
+## Install mongodb as Docker container
 
 ```bash
 docker run --name mongodb -d mongo:latest -p 27017:27017
 ```
+
+## Run the API as Docker container
+
+````bash
+make docker
+````
