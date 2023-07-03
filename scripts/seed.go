@@ -37,11 +37,11 @@ func main() {
 		Hotel:   hotelStore,
 	}
 
-	user := fixtures.AddUser(store, "james", "foo", false)
-	fmt.Println("james ->", api.CreateTokenFromUser(user))
+	user := fixtures.AddUser(store, "john", "doe", false)
+	fmt.Println("john ->", api.CreateTokenFromUser(user))
 	admin := fixtures.AddUser(store, "admin", "admin", true)
 	fmt.Println("admin ->", api.CreateTokenFromUser(admin))
-	hotel := fixtures.AddHotel(store, "some hotel", "bermuda", 5, nil)
+	hotel := fixtures.AddHotel(store, "hotel", "location", 4.5, nil)
 	room := fixtures.AddRoom(store, "large", true, 88.44, hotel.ID)
 	booking := fixtures.AddBooking(store, user.ID, room.ID, time.Now(), time.Now().AddDate(0, 0, 5))
 	fmt.Println("booking ->", booking.ID)
@@ -50,7 +50,7 @@ func main() {
 	max := 5.0
 
 	for i := 0; i < 100; i++ {
-		name := fmt.Sprintf("random hotel name %d", i)
+		name := fmt.Sprintf("hotel %d", i)
 		location := fmt.Sprintf("location %d", i)
 		rating := min + rand.Float64()*(max-min)
 		roundedRating := math.Round(rating*10) / 10
