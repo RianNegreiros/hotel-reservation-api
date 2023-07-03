@@ -13,7 +13,7 @@ import (
 type HotelStore interface {
 	Insert(context.Context, *types.Hotel) (*types.Hotel, error)
 	Update(context.Context, Map, Map) error
-	GetAll(context.Context, Map, *options.FindOptions) ([]*types.Hotel, error)
+	GetAll(context.Context, Map, *Pagination) ([]*types.Hotel, error)
 	GetByID(context.Context, string) (*types.Hotel, error)
 }
 
@@ -44,11 +44,15 @@ func (s *MongoHotelStore) Update(ctx context.Context, filter Map, update Map) er
 	return err
 }
 
-func (s *MongoHotelStore) GetAll(ctx context.Context, filter Map, opts *options.FindOptions) ([]*types.Hotel, error) {
-	resp, err := s.collection.Find(ctx, filter, opts)
+func (s *MongoHotelStore) GetAll(ctx context.Context, filter Map, pag *Pagination) ([]*types.Hotel, error) {
+	opts := options.FindOptions{}
+	opts.SetSkip((pag.Page - 1) * pag.Limit)
+	opts.SetLimit(pag.Limit)
+	resp, err := s.collection.Find(ctx, filter, &opts)
 	if err != nil {
 		return nil, err
 	}
+
 	var hotels []*types.Hotel
 	if err := resp.All(ctx, &hotels); err != nil {
 		return nil, err

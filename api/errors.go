@@ -57,3 +57,10 @@ func ErrInvalidID() Error {
 		Err:  "invalid id given",
 	}
 }
+
+func ErrInvalidQueryParams() Error {
+	return Error{
+		Code: http.StatusBadRequest,
+		Err:  "invalid query params",
+	}
+}
